@@ -100,13 +100,12 @@ export const authOptions: NextAuthOptions = {
 
           const isValid = await bcrypt.compare(
             credentials.password,
-            user[0].password_hash!,
+            user[0].passwordHash!,
           );
-
           if (!isValid) {
             return null;
           } else {
-            return user as unknown as User;
+            return user[0] as unknown as User;
           }
         } catch (error) {
           throw new Error(error as string);

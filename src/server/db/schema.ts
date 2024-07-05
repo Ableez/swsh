@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   index,
   integer,
   json,
@@ -18,7 +19,7 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `swsh_${name}`);
+export const createTable = pgTableCreator((name) => name);
 
 export const posts = createTable(
   "post",
@@ -49,10 +50,16 @@ export const users = createTable("user", {
   emailVerified: timestamp("emailVerified", {
     mode: "date",
     withTimezone: true,
+  }),
+  createdAt: timestamp("emailVerified", {
+    mode: "date",
+    withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
-  push_notification_subscription: json("push_notification_subscription"),
-  password_hash: varchar("password_hash", { length: 255 }),
+  pushNotificationSubscription: json("pushNotificationSubscription"),
+  passwordHash: varchar("passwordHash", { length: 255 }),
+  phoneNumber: varchar("phoneNumber", { length: 255 }),
+  phoneNumberVerified: boolean("phoneNumberVerified").default(false),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

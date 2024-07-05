@@ -1,6 +1,6 @@
 {
-  "id": "7bc65bfe-8181-4dc6-9563-33103e6969cb",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "c7528c9c-6564-49bf-a541-2ef67b89bd34",
+  "prevId": "7bc65bfe-8181-4dc6-9563-33103e6969cb",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -265,14 +265,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "push_notification_subscription": {
-          "name": "push_notification_subscription",
+        "pushNotificationSubscription": {
+          "name": "pushNotificationSubscription",
           "type": "json",
           "primaryKey": false,
           "notNull": false
         },
-        "password_hash": {
-          "name": "password_hash",
+        "passwordHash": {
+          "name": "passwordHash",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false

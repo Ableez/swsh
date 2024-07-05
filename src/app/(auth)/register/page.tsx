@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { api } from "@/trpc/react";
 
 const registerSchema = z.object({
   username: z.string().min(2, {
@@ -49,10 +50,12 @@ const RegisterForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerSchema>) {
-    console.log(values);
-    api
-  }
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    console.log("INIT VALS:", values);
+    const user = api.user.register.useMutation(values);
+
+    console.log(user);
+  };
 
   return (
     <Card className="mx-auto h-fit max-w-sm">
@@ -62,7 +65,13 @@ const RegisterForm = () => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(onSubmit);
+            }}
+            className="space-y-8"
+          >
             <FormField
               control={form.control}
               name="username"
