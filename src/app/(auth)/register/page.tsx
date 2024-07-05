@@ -1,19 +1,7 @@
 "use client";
-
-import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   Card,
   CardContent,
@@ -22,39 +10,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { api } from "@/trpc/react";
+import SubmitButton from "@/components/auth/submit-button";
+import { registerAction } from "@/lib/actions/register-action";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
-const registerSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phoneNumber: z.string().min(10, {
-    message: "Phone number must be at least 10 digits.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-});
+export default function RegisterPage() {
+  const router = useRouter();
 
-const RegisterForm = () => {
-  const form = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-    console.log("INIT VALS:", values);
-    const user = api.user.register.useMutation(values);
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get("password");
 
-    console.log(user);
+    try {
+      const resp = await registerAction(formData);
+
+      if (!resp?.success) {
+        toast.error(resp.error);
+      } else {
+        toast.success("Registered successfully, Signing you in...");
+      }
+
+      console.log("RESP", resp);
+      await signIn("credentials", {
+        email: resp.user?.email,
+        password: password,
+        redirect: true,
+        callbackUrl: "/",
+      }).catch((e) => console.log(e));
+
+      console.log(resp);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      toast.dismiss("loading-spinner");
+    }
   };
 
   return (
@@ -64,75 +57,13 @@ const RegisterForm = () => {
         <CardDescription>Create an account to get started</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(onSubmit);
-            }}
-            className="space-y-8"
-          >
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="johndoe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="johndoe@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1234567890" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full">
-              Register
-            </Button>
-          </form>
-        </Form>
+        <form onSubmit={(e) => handleSubmit(e)} className="space-y-8">
+          <Input name="username" placeholder="Username" />
+          <Input name="email" placeholder="Email" />
+          <Input name="phoneNumber" placeholder="Phone Number" />
+          <Input name="password" placeholder="Password" />
+          <SubmitButton />
+        </form>
         <Button variant="outline" className="mt-4 w-full">
           Register with Google
         </Button>
@@ -145,6 +76,4 @@ const RegisterForm = () => {
       </CardContent>
     </Card>
   );
-};
-
-export default RegisterForm;
+}

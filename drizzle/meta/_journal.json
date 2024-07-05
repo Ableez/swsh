@@ -15,6 +15,13 @@
       "when": 1720171208937,
       "tag": "0001_groovy_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1720181999719,
+      "tag": "0002_elite_timeslip",
+      "breakpoints": true
     }
   ]
 }

@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { CreatePost } from "@/app/_components/create-post";
-import { getServerAuthSession } from "@/server/auth";
+import { auth } from "@/server/auth";
 import { api } from "@/trpc/server";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await getServerAuthSession();
+  const session = await auth();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -64,7 +64,7 @@ export default async function Home() {
 }
 
 async function CrudShowcase() {
-  const session = await getServerAuthSession();
+  const session = await auth();
   if (!session?.user) return null;
 
   const latestPost = await api.post.getLatest();

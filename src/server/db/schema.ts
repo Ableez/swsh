@@ -46,19 +46,19 @@ export const users = createTable("user", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
     withTimezone: true,
   }),
-  createdAt: timestamp("emailVerified", {
+  createdAt: timestamp("createdAt", {
     mode: "date",
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
   pushNotificationSubscription: json("pushNotificationSubscription"),
   passwordHash: varchar("passwordHash", { length: 255 }),
-  phoneNumber: varchar("phoneNumber", { length: 255 }),
+  phoneNumber: varchar("phoneNumber", { length: 255 }).unique(),
   phoneNumberVerified: boolean("phoneNumberVerified").default(false),
 });
 
